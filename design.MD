@@ -1,6 +1,6 @@
 # CommsTool 3 Design Document
 
-02/01/2022
+2nd January 2022
 
 ## Overview
 
