@@ -18,13 +18,13 @@ from flaskapp.config import Config
 # Constants
 
 
-SESSION: Session = (
+_SESSION: Session = (
     requests.Session()
 )  # We will use the same session throughtout this module
-SESSION.cert = Config.REQUESTSOPTIONS["cert"]
-SESSION.headers = Config.REQUESTSOPTIONS["headers"]
+_SESSION.cert = Config.REQUESTSOPTIONS["cert"]
+_SESSION.headers = Config.REQUESTSOPTIONS["headers"]
 
-APIBASEURL: ParseResult = urllib.parse.urlparse(
+_APIBASEURL: ParseResult = urllib.parse.urlparse(
     urllib.parse.urlunsplit(
         (
             Config.JIRAOPTIONS["scheme"],
@@ -66,15 +66,15 @@ class JiraTicket:
             """
         )
 
-    @staticmethod
-    def create(ref: str, api: ParseResult = APIBASEURL):
+    @classmethod
+    def create(cls, ref: str, api: ParseResult = _APIBASEURL):
         """
         Static method used to create an instance of a JiraTicket or subclass.
         Returns an OpsIncidentTicket object if project is OPS and issuetype is Incident,
         returns JiraTicket otherwise.
         """
         fetch_url = api.geturl() + f"issue/{ref}"
-        response = SESSION.get(fetch_url, verify=True)
+        response = _SESSION.get(fetch_url, verify=True)
         response.raise_for_status()  # Stop on HTTP error
         data = json.loads(response.text)
         if (
@@ -90,7 +90,7 @@ class JiraTicket:
         return url._replace(path=f"browse/{self.ticket_data['key']}")
 
     def update_from_jira(self):
-        response = SESSION.get(self.api_url)
+        response = _SESSION.get(self.api_url)
         response.raise_for_status()  # Stop on HTTP error
         # Check that the ticket has not moved projects (project in response does not
         # match current project). If it has, stop.
@@ -106,7 +106,7 @@ class JiraTicket:
 @dataclass(init=False)
 class OpsIncidentTicket(JiraTicket):
     """
-    Subclass of JiraTicket with data relating to OPS indicents
+    Subclass of JiraTicket with data relating to OPS incidents
     """
 
     incident_fields: dict
