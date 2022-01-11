@@ -4,3 +4,4 @@ handover.py
 test*
 Test*
 __pycache__
+.venv
